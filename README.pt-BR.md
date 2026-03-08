@@ -1,6 +1,6 @@
 # MCP RabbitMQ Server
 
-> 🇧🇷 [Leia em Português](README.pt-BR.md)
+> 🇺🇸 [Read in English](README.md)
 
 Servidor MCP (Model Context Protocol) para interação com RabbitMQ via Management HTTP API.
 
