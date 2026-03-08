@@ -2,85 +2,85 @@
 
 > 🇧🇷 [Leia em Português](README.pt-BR.md)
 
-Servidor MCP (Model Context Protocol) para interação com RabbitMQ via Management HTTP API.
+MCP (Model Context Protocol) server for interacting with RabbitMQ via the Management HTTP API.
 
-O Model Context Protocol (MCP) permite que aplicações de IA se conectem a servidores externos para acessar ferramentas e recursos. Este servidor expõe uma única ferramenta para executar qualquer operação na Management API do RabbitMQ.
+The Model Context Protocol (MCP) enables AI applications to connect to external servers to access tools and resources. This server exposes a single tool to perform any operation on the RabbitMQ Management API.
 
-## Funcionalidades
+## Features
 
-- Execução de qualquer operação suportada pela Management HTTP API do RabbitMQ.
-- Suporte a GET, POST, PUT e DELETE.
-- Autenticação via usuário/senha configuráveis.
-- Logging de todas as operações em `var/logs/mcp.log`.
+- Execution of any operation supported by the RabbitMQ Management HTTP API.
+- Support for GET, POST, PUT, and DELETE.
+- Authentication via configurable username/password.
+- Logging of all operations in `var/logs/mcp.log`.
 
-## Pré-requisitos
+## Prerequisites
 
-- RabbitMQ com o plugin `rabbitmq_management` habilitado (porta padrão `15672`).
-- PHP 8.5+ com extensão `curl`.
+- RabbitMQ with the `rabbitmq_management` plugin enabled (default port `15672`).
+- PHP 8.5+ with `curl` extension.
 
-## Instalação
+## Installation
 
 ```bash
 composer install
 ```
 
-## Configuração
+## Configuration
 
-Copie o arquivo `.env.example` para `.env` e ajuste as variáveis conforme necessário:
+Copy the `.env.example` file to `.env` and adjust the variables as needed:
 
 ```bash
 cp .env.example .env
 ```
 
-Variáveis de ambiente:
-- `RABBITMQ_HOST` (padrão: 127.0.0.1) — Host do RabbitMQ
-- `RABBITMQ_PORT` (padrão: 15672) — Porta da Management API
-- `RABBITMQ_USER` (padrão: mcp) — Usuário da Management API
-- `RABBITMQ_PASS` (padrão: mcp) — Senha da Management API
-- `RABBITMQ_VHOST` (padrão: /) — Virtual host padrão (usado como referência nas chamadas)
+Environment variables:
+- `RABBITMQ_HOST` (default: 127.0.0.1) — RabbitMQ Host
+- `RABBITMQ_PORT` (default: 15672) — Management API Port
+- `RABBITMQ_USER` (default: mcp) — Management API User
+- `RABBITMQ_PASS` (default: mcp) — Management API Password
+- `RABBITMQ_VHOST` (default: /) — Default virtual host (used as reference in calls)
 
-## Execução
+## Execution
 
 ```bash
 composer serve
-# ou
+# or
 php server.php
 ```
 
-O servidor é executado via STDIO, aguardando conexões MCP.
+The server runs via STDIO, waiting for MCP connections.
 
-## Ferramenta disponível
+## Available Tool
 
 ### `exec`
 
-Executa um comando na Management HTTP API do RabbitMQ.
+Executes a command on the RabbitMQ Management HTTP API.
 
-**Parâmetros:**
-- `method` (string, obrigatório) — Método HTTP: `GET`, `POST`, `PUT` ou `DELETE`.
-- `endpoint` (string, obrigatório) — Caminho da API, ex: `/api/queues/%2F`.
-- `payload` (string, opcional) — Corpo JSON para requisições POST/PUT.
+**Parameters:**
+- `method` (string, required) — HTTP Method: `GET`, `POST`, `PUT`, or `DELETE`.
+- `endpoint` (string, required) — API path, e.g., `/api/queues/%2F`.
+- `payload` (string, optional) — JSON body for POST/PUT requests.
 
-**Retorno:**
-- A resposta JSON parseada da API do RabbitMQ, ou `{ "status": "ok", "http_code": N }` para respostas sem corpo.
+**Return:**
+- The parsed JSON response from the RabbitMQ API, or `{ "status": "ok", "http_code": N }` for responses without a body.
 
-## Exemplos de uso
+## Usage Examples
 
-| Operação | method | endpoint | payload |
+| Operation | method | endpoint | payload |
 |---|---|---|---|
-| Visão geral do broker | `GET` | `/api/overview` | — |
-| Listar filas (vhost /) | `GET` | `/api/queues/%2F` | — |
-| Detalhes de uma fila | `GET` | `/api/queues/%2F/minha-fila` | — |
-| Criar/declarar fila | `PUT` | `/api/queues/%2F/minha-fila` | `{"durable":true}` |
-| Purgar fila | `DELETE` | `/api/queues/%2F/minha-fila/contents` | — |
-| Excluir fila | `DELETE` | `/api/queues/%2F/minha-fila` | — |
-| Listar exchanges | `GET` | `/api/exchanges/%2F` | — |
-| Publicar mensagem | `POST` | `/api/exchanges/%2F/amq.default/publish` | `{"properties":{},"routing_key":"minha-fila","payload":"olá","payload_encoding":"string"}` |
-| Consumir mensagens | `POST` | `/api/queues/%2F/minha-fila/get` | `{"count":5,"ackmode":"ack_requeue_true","encoding":"auto"}` |
-| Listar conexões | `GET` | `/api/connections` | — |
-| Listar consumers | `GET` | `/api/consumers` | — |
+| Broker overview | `GET` | `/api/overview` | — |
+| List queues (vhost /) | `GET` | `/api/queues/%2F` | — |
+| Queue details | `GET` | `/api/queues/%2F/my-queue` | — |
+| Create/declare queue | `PUT` | `/api/queues/%2F/my-queue` | `{"durable":true}` |
+| Purge queue | `DELETE` | `/api/queues/%2F/my-queue/contents` | — |
+| Delete queue | `DELETE` | `/api/queues/%2F/my-queue` | — |
+| List exchanges | `GET` | `/api/exchanges/%2F` | — |
+| Publish message | `POST` | `/api/exchanges/%2F/amq.default/publish` | `{"properties":{},"routing_key":"my-queue","payload":"hello","payload_encoding":"string"}` |
+| Consume messages | `POST` | `/api/queues/%2F/my-queue/get` | `{"count":5,"ackmode":"ack_requeue_true","encoding":"auto"}` |
+| List connections | `GET` | `/api/connections` | — |
+| List consumers | `GET` | `/api/consumers` | — |
 
-> O vhost `/` deve ser codificado como `%2F` na URL.
+> The `/` vhost must be encoded as `%2F` in the URL.
 
-## Integração com VS Code
+## VS Code Integration
 
-Configure o servidor no arquivo de settings do Copilot/MCP apontando para `php server.php` no diretório do projeto.
+Configure the server in the Copilot/MCP settings file pointing to `php server.php` in the project directory.
